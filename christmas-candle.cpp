@@ -6,17 +6,19 @@
 #include "christmas-candle.h"
 #include "Wdt.h"
 
-volatile int f_wdt = 1;
-
 Wdt wdt;
 
-int cadles[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+uint8_t led1 = 1;
+uint8_t led2 = 1;
+uint8_t led3 = 1;
+uint8_t led4 = 1;
+uint8_t led5 = 1;
+uint8_t led6 = 1;
+uint8_t led7 = 1;
+uint8_t led8 = 1;
+uint8_t led9 = 1;
 
-ISR(WDT_vect) {
-	if (f_wdt == 0) {
-		f_wdt = 1;
-	}
-}
+uint8_t candles[] = { led1, led2, led3, led4, led5, led6, led7, led8, led9 };
 
 void setup() {
 	Serial.begin(9600);
@@ -24,12 +26,19 @@ void setup() {
 	delay(100);
 	pinMode(LED_BUILTIN, OUTPUT);
 
-	Serial.println("Initialization complete...");
+	for (int i = 0; i < sizeof(candles); i++) {
+		pinMode(candles[i], OUTPUT);
+		analogWrite(candles[i], 0);
+	}
+
+	Serial.println("Initialization complete.");
 	delay(100);
+
+	say_hello();
 }
 
 void loop() {
-	if (f_wdt != 1) {
+	if (wdt.isSleep()) {
 		return;
 	}
 
@@ -38,17 +47,10 @@ void loop() {
 	int val = analogRead(SENSOR_PIN);
 	Serial.println(val);
 
-	f_wdt = 0;
-
 	wdt.enterSleep();
 }
 
-
-
-
-
 void say_hello() {
-
 
 }
 

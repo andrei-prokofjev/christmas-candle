@@ -5,6 +5,7 @@ class Wdt {
 public:
 	Wdt();
 	void enterSleep();
+	bool isSleep();
 private:
 	void setupWdt();
 };

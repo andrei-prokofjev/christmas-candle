@@ -5,11 +5,20 @@
 
 #include "Wdt.h"
 
+volatile int f_wdt = 1;
+
+ISR(WDT_vect) {
+	if (f_wdt == 0) {
+		f_wdt = 1;
+	}
+}
+
 Wdt::Wdt() {
 	setupWdt();
 }
 
 void Wdt::enterSleep() {
+	f_wdt = 0;
 	//	 There are five different sleep modes in order of power saving:
 	//	 SLEEP_MODE_IDLE - the lowest power saving mode
 	//	 SLEEP_MODE_ADC
@@ -70,5 +79,9 @@ void Wdt::setupWdt() {
 	WDTCSR = (0 << WDP3) | (1 << WDP2) | (1 << WDP1) | (1 << WDP0);
 	// Enable the WD interrupt (note: no reset).
 	WDTCSR |= _BV(WDIE);
+}
+
+bool Wdt::isSleep() {
+	return f_wdt == 0;
 }
 
