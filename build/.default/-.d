@@ -1,2 +1,2 @@
-.sc7262853720969661326.o: \
- /home/andrei/git/christmas-candle/.sc7262853720969661326.cpp
+.sc3695051462322671306.o: \
+ /home/andrei/git/christmas-candle/.sc3695051462322671306.cpp
