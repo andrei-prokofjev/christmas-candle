@@ -24,7 +24,7 @@ void setup() {
 	delay(100);
 	pinMode(LED_BUILTIN, OUTPUT);
 
-	Serial.println("Initialization complete.");
+	Serial.println("Initialization complete...");
 	delay(100);
 }
 
