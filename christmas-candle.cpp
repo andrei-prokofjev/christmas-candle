@@ -3,7 +3,11 @@
 #include <avr/power.h>
 #include <avr/wdt.h>
 
+#include "christmas-candle.h"
+
 volatile int f_wdt = 1;
+
+int cadles[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
 ISR(WDT_vect) {
 	if (f_wdt == 0) {
@@ -11,54 +15,73 @@ ISR(WDT_vect) {
 	}
 }
 
-// Enters the arduino into sleep mode.
+void setup() {
+	Serial.begin(9600);
+	Serial.println("Initializing...");
+	delay(100);
+	pinMode(LED_BUILTIN, OUTPUT);
+	setupWatchDogTimer();
+	Serial.println("Initialization complete.");
+	delay(100);
+}
+
+void loop() {
+	if (f_wdt != 1) {
+		return;
+	}
+
+	blink(20);
+
+	int val = analogRead(SENSOR_PIN);
+	Serial.println(val);
+
+	f_wdt = 0;
+
+	enterSleep();
+}
+
 void enterSleep(void) {
-	// There are five different sleep modes in order of power saving:
-	// SLEEP_MODE_IDLE - the lowest power saving mode
-	// SLEEP_MODE_ADC
-	// SLEEP_MODE_PWR_SAVE
-	// SLEEP_MODE_STANDBY
-	// SLEEP_MODE_PWR_DOWN - the highest power saving mode
+//	 There are five different sleep modes in order of power saving:
+//	 SLEEP_MODE_IDLE - the lowest power saving mode
+//	 SLEEP_MODE_ADC
+//	 SLEEP_MODE_PWR_SAVE
+//	 SLEEP_MODE_STANDBY
+//	 SLEEP_MODE_PWR_DOWN - the highest power saving mode
+
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
 	sleep_enable()
 	;
-
-	// Now enter sleep mode.
 	sleep_mode()
 	;
 
 	// The program will continue from here after the WDT timeout
 
-	// First thing to do is disable sleep.
 	sleep_disable()
 	;
-
-	// Re-enable the peripherals.
 	power_all_enable();
 }
 
-// Setup the Watch Dog Timer (WDT)
 void setupWatchDogTimer() {
-	// The MCU Status Register (MCUSR) is used to tell the cause of the last
-	// reset, such as brown-out reset, watchdog reset, etc.
-	// NOTE: for security reasons, there is a timed sequence for clearing the
-	// WDE and changing the time-out configuration. If you don't use this
-	// sequence properly, you'll get unexpected results.
+//	The MCU Status Register (MCUSR) is used to tell the cause of the last
+//	reset, such as brown-out reset, watchdog reset, etc.
+//	NOTE: for security reasons, there is a timed sequence for clearing the
+//	WDE and changing the time-out configuration. If you don't use this
+//	sequence properly, you'll get unexpected results.
 
-	// Clear the reset flag on the MCUSR, the WDRF bit (bit 3).
+//  Clear the reset flag on the MCUSR, the WDRF bit (bit 3).
 	MCUSR &= ~(1 << WDRF);
 
-	// Configure the Watchdog timer Control Register (WDTCSR)
-	// The WDTCSR is used for configuring the time-out, mode of operation, etc
-
-	// In order to change WDE or the pre-scaler, we need to set WDCE (This will
-	// allow updates for 4 clock cycles).
-
-	// Set the WDCE bit (bit 4) and the WDE bit (bit 3) of the WDTCSR. The WDCE
-	// bit must be set in order to change WDE or the watchdog pre-scalers.
-	// Setting the WDCE bit will allow updates to the pre-scalers and WDE for 4
-	// clock cycles then it will be reset by hardware.
+//	 Configure the Watchdog timer Control Register (WDTCSR)
+//	 The WDTCSR is used for configuring the time-out, mode of operation, etc
+//
+//	 In order to change WDE or the pre-scaler, we need to set WDCE (This will
+//	 allow updates for 4 clock cycles).
+//
+//	 Set the WDCE bit (bit 4) and the WDE bit (bit 3) of the WDTCSR. The WDCE
+//	 bit must be set in order to change WDE or the watchdog pre-scalers.
+//	 Setting the WDCE bit will allow updates to the pre-scalers and WDE for 4
+//	 clock cycles then it will be reset by hardware.
 	WDTCSR |= (1 << WDCE) | (1 << WDE);
 
 	/**
@@ -80,32 +103,3 @@ void setupWatchDogTimer() {
 	WDTCSR |= _BV(WDIE);
 }
 
-void setup() {
-	Serial.begin(9600);
-	Serial.println("Initialising...");
-	delay(100);
-	pinMode(LED_BUILTIN, OUTPUT);
-	setupWatchDogTimer();
-	Serial.println("Initialisation complete.");
-	delay(100);
-}
-
-void loop() {
-	// Wait until the watchdog have triggered a wake up.
-	if (f_wdt != 1) {
-		return;
-	}
-
-	// Toggle the LED on
-	digitalWrite(LED_BUILTIN, HIGH);
-	// wait
-	delay(20);
-	// Toggle the LED off
-	digitalWrite(LED_BUILTIN, LOW);
-
-	// clear the flag so we can run above code again after the MCU wake up
-	f_wdt = 0;
-
-	// Re-enter sleep mode.
-	enterSleep();
-}
