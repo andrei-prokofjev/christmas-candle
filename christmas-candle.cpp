@@ -20,8 +20,11 @@ uint8_t led9 = 12;
 
 uint8_t candles[] = { led1, led2, led3, led4, led5, led6, led7, led8, led9 };
 
+int count_high = 0;
+int count_low = 0;
+
 void setup() {
-	Serial.begin(9600);
+	Serial.begin(57600);
 	Serial.println("Initializing...");
 	delay(100);
 	pinMode(LED_BUILTIN, OUTPUT);
@@ -34,9 +37,6 @@ void setup() {
 
 	Serial.println("Initialization complete.");
 	delay(100);
-
-	say_hello();
-
 }
 
 void loop() {
@@ -45,25 +45,46 @@ void loop() {
 		return;
 	}
 
-	blink(20);
+//	blink(20);
 
-
-//
 	int val = analogRead(SENSOR_PIN);
-	Serial.println(val);
+
+	// check each 10 min
+	if (val > 700) {
+		if (count_high < 36) { // 6h
+			if (count_high == 0) {
+				swith(HIGH);
+			}
+			count_high++;
+		} else {
+			swith(LOW);
+			count_low = 0;
+		}
+	} else {
+		if (count_high > 0) {
+			count_low++;
+			if (count_low > 60) {
+				count_high = 0;
+			}
+		}
+	}
+
+	Serial.print(val);
+	Serial.println();
 
 	wdt.enterSleep();
 }
 
 void say_hello() {
+	swith(HIGH);
+	delay(100);
+	swith(LOW);
+}
+
+void swith(int val) {
 	for (int i = 0; i < sizeof(candles); i++) {
 		delay(30);
-		digitalWrite(candles[i], HIGH);
+		digitalWrite(candles[i], val);
 	}
-	delay(100);
-	for (int i = 0; i < sizeof(candles); i++) {
-			delay(30);
-			digitalWrite(candles[i], LOW);
-		}
 }
 

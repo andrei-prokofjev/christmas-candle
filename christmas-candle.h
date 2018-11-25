@@ -4,6 +4,8 @@
 
 #define SENSOR_PIN (14)
 
+void swith(int val);
+
 void say_hello();
 
 void enterSleep(void);
