@@ -9,8 +9,8 @@
 #define ON 0x1
 #define OFF 0x0
 
-#define MAX_NIGHT_COUNT 36 // 6h
-#define MAX_PAUSE_COUNT 72 // 12h
+#define MAX_NIGHT_COUNT 4 // 6h
+#define MAX_PAUSE_COUNT 4 // 12h
 
 Wdt wdt;
 
@@ -31,8 +31,8 @@ int pause_count = MAX_PAUSE_COUNT;
 
 void setup() {
 	Serial.begin(115200);
-	Serial.print("Initializing...");
-	Serial.println("\r");
+	Serial.println("Initializing...");
+
 	delay(100);
 	pinMode(LED_BUILTIN, OUTPUT);
 
@@ -42,8 +42,8 @@ void setup() {
 		pinMode(candles[i], OUTPUT);
 	}
 
-	Serial.print("Initialization complete.");
-	Serial.println("\r");
+	Serial.println("Initialization complete.");
+
 	delay(100);
 }
 
@@ -63,8 +63,8 @@ void loop() {
 	Serial.print("   pause: ");
 	Serial.print(pause_count);
 	Serial.print("/");
-	Serial.print(MAX_PAUSE_COUNT);
-	Serial.print("\r\n");
+	Serial.println(MAX_PAUSE_COUNT);
+
 
 	if (pause_count == MAX_PAUSE_COUNT) {
 		if (val > 700) {
@@ -84,7 +84,8 @@ void loop() {
 			}
 		}
 	} else {
-		if (pause_count++ == MAX_PAUSE_COUNT) {
+		if (++pause_count == MAX_PAUSE_COUNT) {
+			Serial.println("pause complete");
 			night_count = 0; // can be switch on
 		}
 	}

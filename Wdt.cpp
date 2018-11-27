@@ -10,7 +10,7 @@ volatile int blink_count = 0;
 
 ISR(WDT_vect) {
 	if (f_wdt == 0) {
-		if (blink_count++ == 1) { // 75 - 10 min
+		if (++blink_count == 1) { // 75 - 10 min
 			blink_count = 0;
 			f_wdt = 1;
 		}
@@ -80,7 +80,7 @@ void Wdt::setupWdt() {
 	 *	1    0    0    0    |  512K cycles  | 4.0 s
 	 *	1    0    0    1    | 1024K cycles  | 8.0 s
 	 */
-	WDTCSR = (1 << WDP3) | (0 << WDP2) | (0 << WDP1) | (1 << WDP0);
+	WDTCSR = (1 << WDP3) | (0 << WDP2) | (0 << WDP1) | (0 << WDP0);
 	// Enable the WD interrupt (note: no reset).
 	WDTCSR |= _BV(WDIE);
 }
