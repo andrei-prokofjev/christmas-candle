@@ -12,9 +12,6 @@ void enterSleep(void);
 
 void setupWatchDogTimer();
 
-bool isNightNow();
-bool isPause();
-
 void blink(int time) {
 	digitalWrite(LED_BUILTIN, HIGH);
 	delay(time);

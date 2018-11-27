@@ -9,8 +9,10 @@
 #define ON 0x1
 #define OFF 0x0
 
-#define MAX_NIGHT_COUNT 4 // 6h
-#define MAX_PAUSE_COUNT 4 // 12h
+
+#define MAX_NIGHT_COUNT 6 * 6 // 6h
+#define MAX_PAUSE_COUNT 12 * 6 // 12h
+
 
 Wdt wdt;
 
@@ -48,8 +50,7 @@ void setup() {
 }
 
 void loop() {
-
-	if (wdt.isSleep()) {
+	if (wdt.isSleep()) { // do nothing while sleep
 		return;
 	}
 
@@ -66,15 +67,16 @@ void loop() {
 	Serial.println(MAX_PAUSE_COUNT);
 
 
+
 	if (pause_count == MAX_PAUSE_COUNT) {
 		if (val > 700) {
-			if (night_count == 0){
+			if (night_count == 0) {
 				swith(ON);
 			}
 
 			night_count++;
 
-			if (night_count % 6 == 0) {
+			if (night_count % 6 == 0) { // say hello each hour
 				say_hello();
 			}
 
@@ -93,14 +95,6 @@ void loop() {
 	delay(50);
 
 	wdt.enterSleep();
-}
-
-bool isNightNow() {
-	return night_count < MAX_NIGHT_COUNT;
-}
-
-bool isPause() {
-	return pause_count < MAX_PAUSE_COUNT;
 }
 
 void say_hello() {

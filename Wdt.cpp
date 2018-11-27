@@ -5,13 +5,15 @@
 
 #include "Wdt.h"
 
-volatile int f_wdt = 1;
-volatile int blink_count = 0;
+volatile int f_wdt = 0;
+volatile int sleep_count = 0;
 
 ISR(WDT_vect) {
 	if (f_wdt == 0) {
-		if (++blink_count == 1) { // 75 - 10 min
-			blink_count = 0;
+
+		if (sleep_count++ == 1 ) { //  75 - 10 min (8 * 75 = 600)
+			sleep_count = 0;
+
 			f_wdt = 1;
 		}
 	}
