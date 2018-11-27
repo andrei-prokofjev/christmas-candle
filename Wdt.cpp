@@ -5,13 +5,12 @@
 
 #include "Wdt.h"
 
-volatile int f_wdt = 0;
+volatile int f_wdt = 1;
 volatile int sleep_count = 0;
 
 ISR(WDT_vect) {
 	if (f_wdt == 0) {
-
-		if (sleep_count++ == 1 ) { //  75 - 10 min (8 * 75 = 600)
+		if (++sleep_count == 75 ) { //  75 - 10 min (8 * 75 = 600)
 			sleep_count = 0;
 
 			f_wdt = 1;
@@ -82,7 +81,7 @@ void Wdt::setupWdt() {
 	 *	1    0    0    0    |  512K cycles  | 4.0 s
 	 *	1    0    0    1    | 1024K cycles  | 8.0 s
 	 */
-	WDTCSR = (1 << WDP3) | (0 << WDP2) | (0 << WDP1) | (0 << WDP0);
+	WDTCSR = (1 << WDP3) | (0 << WDP2) | (0 << WDP1) | (1 << WDP0);
 	// Enable the WD interrupt (note: no reset).
 	WDTCSR |= _BV(WDIE);
 }

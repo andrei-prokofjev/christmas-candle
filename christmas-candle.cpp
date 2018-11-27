@@ -9,10 +9,8 @@
 #define ON 0x1
 #define OFF 0x0
 
-
 #define MAX_NIGHT_COUNT 6 * 6 // 6h
 #define MAX_PAUSE_COUNT 12 * 6 // 12h
-
 
 Wdt wdt;
 
@@ -66,18 +64,16 @@ void loop() {
 	Serial.print("/");
 	Serial.println(MAX_PAUSE_COUNT);
 
-
-
 	if (pause_count == MAX_PAUSE_COUNT) {
-		if (val > 700) {
+		if (val > 400) {
 			if (night_count == 0) {
 				swith(ON);
 			}
 
 			night_count++;
 
-			if (night_count % 6 == 0) { // say hello each hour
-				say_hello();
+			if (night_count % 6 == 0) {
+				digitalWrite(candles[(night_count / 6) - 1], LOW);
 			}
 
 			if (night_count == MAX_NIGHT_COUNT) {
