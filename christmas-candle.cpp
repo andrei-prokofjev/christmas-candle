@@ -6,6 +6,12 @@
 #include "christmas-candle.h"
 #include "Wdt.h"
 
+#define ON 0x1
+#define OFF 0x0
+
+#define MAX_NIGHT_COUNT 36 // 6h
+#define MAX_PAUSE_COUNT 72 // 12h
+
 Wdt wdt;
 
 uint8_t led1 = 7;
@@ -20,12 +26,13 @@ uint8_t led9 = 12;
 
 uint8_t candles[] = { led1, led2, led3, led4, led5, led6, led7, led8, led9 };
 
-int count_high = 0;
-int count_low = 0;
+int night_count = 0;
+int pause_count = MAX_PAUSE_COUNT;
 
 void setup() {
-	Serial.begin(57600);
-	Serial.println("Initializing...");
+	Serial.begin(115200);
+	Serial.print("Initializing...");
+	Serial.println("\r");
 	delay(100);
 	pinMode(LED_BUILTIN, OUTPUT);
 
@@ -35,7 +42,8 @@ void setup() {
 		pinMode(candles[i], OUTPUT);
 	}
 
-	Serial.println("Initialization complete.");
+	Serial.print("Initialization complete.");
+	Serial.println("\r");
 	delay(100);
 }
 
@@ -45,40 +53,59 @@ void loop() {
 		return;
 	}
 
-//	blink(20);
-
 	int val = analogRead(SENSOR_PIN);
+	Serial.print("sensor: ");
+	Serial.print(val);
+	Serial.print("  night: ");
+	Serial.print(night_count);
+	Serial.print("/");
+	Serial.print(MAX_NIGHT_COUNT);
+	Serial.print("   pause: ");
+	Serial.print(pause_count);
+	Serial.print("/");
+	Serial.print(MAX_PAUSE_COUNT);
+	Serial.print("\r\n");
 
-	// check each 10 min
-	if (val > 700) {
-		if (count_high < 36) { // 6h
-			if (count_high == 0) {
-				swith(HIGH);
+	if (pause_count == MAX_PAUSE_COUNT) {
+		if (val > 700) {
+			if (night_count == 0){
+				swith(ON);
 			}
-			count_high++;
-		} else {
-			swith(LOW);
-			count_low = 0;
+
+			night_count++;
+
+			if (night_count % 6 == 0) {
+				say_hello();
+			}
+
+			if (night_count == MAX_NIGHT_COUNT) {
+				swith(OFF);
+				pause_count = 0;
+			}
 		}
 	} else {
-		if (count_high > 0) {
-			count_low++;
-			if (count_low > 60) {
-				count_high = 0;
-			}
+		if (pause_count++ == MAX_PAUSE_COUNT) {
+			night_count = 0; // can be switch on
 		}
 	}
 
-	Serial.print(val);
-	Serial.println();
+	delay(50);
 
 	wdt.enterSleep();
 }
 
+bool isNightNow() {
+	return night_count < MAX_NIGHT_COUNT;
+}
+
+bool isPause() {
+	return pause_count < MAX_PAUSE_COUNT;
+}
+
 void say_hello() {
-	swith(HIGH);
+	swith(ON);
 	delay(100);
-	swith(LOW);
+	swith(OFF);
 }
 
 void swith(int val) {

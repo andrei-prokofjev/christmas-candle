@@ -10,7 +10,8 @@ volatile int blink_count = 0;
 
 ISR(WDT_vect) {
 	if (f_wdt == 0) {
-		if (blink_count++ > 75) {
+		if (blink_count++ == 1) { // 75 - 10 min
+			blink_count = 0;
 			f_wdt = 1;
 		}
 	}
@@ -22,7 +23,6 @@ Wdt::Wdt() {
 
 void Wdt::enterSleep() {
 	f_wdt = 0;
-	blink_count = 0;
 	//	 There are five different sleep modes in order of power saving:
 	//	 SLEEP_MODE_IDLE - the lowest power saving mode
 	//	 SLEEP_MODE_ADC
