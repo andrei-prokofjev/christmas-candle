@@ -6,7 +6,7 @@
 #include "christmas-candle.h"
 #include "LowPower.h"
 
-#define DEBUG_
+#define DEBUG
 
 const int ON = 1;
 const int OFF = 0;
@@ -15,7 +15,7 @@ const int _10min = 75 * 8;
 const int _hour = 6 * _10min;
 
 const int MAX_NIGHT_COUNT = 6 * _hour;
-const int MAX_PAUSE_COUNT = 8 * _hour;
+const unsigned int MAX_PAUSE_COUNT =  12 * _hour;
 
 uint8_t led1 = 7;
 uint8_t led2 = 6;
@@ -29,8 +29,8 @@ uint8_t led9 = 12;
 
 uint8_t candles[] = { led1, led2, led3, led4, led5, led6, led7, led8, led9 };
 
-int night_count = 0;
-int pause_count = MAX_PAUSE_COUNT;
+int night_count;
+unsigned int pause_count;
 
 void setup() {
 	Serial.begin(9600);
@@ -45,10 +45,10 @@ void setup() {
 		pinMode(candles[i], OUTPUT);
 	}
 
+	night_count = 0;
+	pause_count = MAX_PAUSE_COUNT;
+
 	Serial.println("Initialization complete.");
-#ifdef DEBUG
-	Serial.println("Debug mode");
-#endif
 
 	delay(100);
 }
@@ -59,7 +59,7 @@ void loop() {
 
 	int val = analogRead(SENSOR_PIN);
 
-#ifdef DEBUG
+#ifdef DEBUG_
 	Serial.print("sensor: ");
 	Serial.print(val);
 	Serial.print("  night: ");
@@ -74,7 +74,7 @@ void loop() {
 
 	if (pause_count == MAX_PAUSE_COUNT) {
 		if (val > 700) {
-			if (night_count == 0) {
+			if (digitalRead(led1) == OFF) {
 				swith(ON);
 			}
 
@@ -84,6 +84,8 @@ void loop() {
 				swith(OFF);
 				pause_count = 0;
 			}
+		} else {
+			swith(OFF);
 		}
 	} else {
 		if (++pause_count == MAX_PAUSE_COUNT) {
