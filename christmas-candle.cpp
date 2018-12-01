@@ -6,7 +6,7 @@
 #include "christmas-candle.h"
 #include "LowPower.h"
 
-#define DEBUG
+#define DEBUG_
 
 const int ON = 1;
 const int OFF = 0;
@@ -59,7 +59,7 @@ void loop() {
 
 	int val = analogRead(SENSOR_PIN);
 
-#ifdef DEBUG_
+#ifdef DEBUG
 	Serial.print("sensor: ");
 	Serial.print(val);
 	Serial.print("  night: ");
