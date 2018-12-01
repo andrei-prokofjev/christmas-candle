@@ -4,15 +4,18 @@
 #include <avr/wdt.h>
 
 #include "christmas-candle.h"
-#include "Wdt.h"
+#include "LowPower.h"
 
-#define ON 0x1
-#define OFF 0x0
+#define DEBUG_
 
-#define MAX_NIGHT_COUNT 6 * 6 // 6h
-#define MAX_PAUSE_COUNT 12 * 6 // 12h
+const int ON = 1;
+const int OFF = 0;
 
-Wdt wdt;
+const int _10min = 75 * 8;
+const int _hour = 6 * _10min;
+
+const int MAX_NIGHT_COUNT = 6 * _hour;
+const int MAX_PAUSE_COUNT = 8 * _hour;
 
 uint8_t led1 = 7;
 uint8_t led2 = 6;
@@ -30,7 +33,7 @@ int night_count = 0;
 int pause_count = MAX_PAUSE_COUNT;
 
 void setup() {
-	Serial.begin(115200);
+	Serial.begin(9600);
 	Serial.println("Initializing...");
 
 	delay(100);
@@ -43,16 +46,20 @@ void setup() {
 	}
 
 	Serial.println("Initialization complete.");
+#ifdef DEBUG
+	Serial.println("Debug mode");
+#endif
 
 	delay(100);
 }
 
 void loop() {
-	if (wdt.isSleep()) { // do nothing while sleep
-		return;
-	}
+
+	LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
 
 	int val = analogRead(SENSOR_PIN);
+
+#ifdef DEBUG
 	Serial.print("sensor: ");
 	Serial.print(val);
 	Serial.print("  night: ");
@@ -63,18 +70,15 @@ void loop() {
 	Serial.print(pause_count);
 	Serial.print("/");
 	Serial.println(MAX_PAUSE_COUNT);
+#endif
 
 	if (pause_count == MAX_PAUSE_COUNT) {
-		if (val > 400) {
+		if (val > 700) {
 			if (night_count == 0) {
 				swith(ON);
 			}
 
 			night_count++;
-
-			if (night_count % 6 == 0) {
-				digitalWrite(candles[(night_count / 6) - 1], LOW);
-			}
 
 			if (night_count == MAX_NIGHT_COUNT) {
 				swith(OFF);
@@ -83,20 +87,12 @@ void loop() {
 		}
 	} else {
 		if (++pause_count == MAX_PAUSE_COUNT) {
-			Serial.println("pause complete");
 			night_count = 0; // can be switch on
 		}
 	}
-
-	delay(50);
-
-	wdt.enterSleep();
-}
-
-void say_hello() {
-	swith(ON);
-	delay(100);
-	swith(OFF);
+#ifdef DEBUG
+	delay(200);
+#endif
 }
 
 void swith(int val) {

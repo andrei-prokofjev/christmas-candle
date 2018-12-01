@@ -6,8 +6,6 @@
 
 void swith(int val);
 
-void say_hello();
-
 void enterSleep(void);
 
 void setupWatchDogTimer();
