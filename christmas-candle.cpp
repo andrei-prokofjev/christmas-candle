@@ -6,16 +6,16 @@
 #include "christmas-candle.h"
 #include "LowPower.h"
 
-#define DEBUG_
+#define DEBUG
 
 const int ON = 1;
 const int OFF = 0;
 
-const int _10min = 75 * 8;
+const int _10min = 75;
 const int _hour = 6 * _10min;
 
 const int MAX_NIGHT_COUNT = 6 * _hour;
-const unsigned int MAX_PAUSE_COUNT =  12 * _hour;
+const int MAX_PAUSE_COUNT =  12 * _hour;
 
 uint8_t led1 = 7;
 uint8_t led2 = 6;
@@ -30,7 +30,7 @@ uint8_t led9 = 12;
 uint8_t candles[] = { led1, led2, led3, led4, led5, led6, led7, led8, led9 };
 
 int night_count;
-unsigned int pause_count;
+int pause_count;
 
 void setup() {
 	Serial.begin(9600);
@@ -55,6 +55,7 @@ void setup() {
 
 void loop() {
 
+
 	LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
 
 	int val = analogRead(SENSOR_PIN);
@@ -73,14 +74,12 @@ void loop() {
 #endif
 
 	if (pause_count == MAX_PAUSE_COUNT) {
-		if (val > 700) {
+		if (val > 750) {
 			if (digitalRead(led1) == OFF) {
 				swith(ON);
 			}
 
-			night_count++;
-
-			if (night_count == MAX_NIGHT_COUNT) {
+			if (++night_count == MAX_NIGHT_COUNT) {
 				swith(OFF);
 				pause_count = 0;
 			}
@@ -95,6 +94,7 @@ void loop() {
 #ifdef DEBUG
 	delay(200);
 #endif
+
 }
 
 void swith(int val) {
