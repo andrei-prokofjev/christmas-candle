@@ -6,7 +6,7 @@
 #include "christmas-candle.h"
 #include "LowPower.h"
 
-#define DEBUG
+#define DEBUG_
 
 const int ON = 1;
 const int OFF = 0;
@@ -54,7 +54,6 @@ void setup() {
 }
 
 void loop() {
-
 
 	LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
 
