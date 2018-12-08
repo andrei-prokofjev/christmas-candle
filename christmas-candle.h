@@ -6,5 +6,7 @@
 
 void swith(int val);
 
+void printState(int val);
+
 
 #endif /* CHRISTMAS_CANDLE_H_ */

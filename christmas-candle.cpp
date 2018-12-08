@@ -44,6 +44,8 @@ void setup() {
 	delay(100);
 }
 
+
+
 void loop() {
 
 	LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
@@ -51,16 +53,7 @@ void loop() {
 	int val = analogRead(SENSOR_PIN);
 
 #ifdef DEBUG
-	Serial.print("sensor: ");
-	Serial.print(val);
-	Serial.print("  night: ");
-	Serial.print(night_count);
-	Serial.print("/");
-	Serial.print(MAX_NIGHT_COUNT);
-	Serial.print("   pause: ");
-	Serial.print(pause_count);
-	Serial.print("/");
-	Serial.println(MAX_PAUSE_COUNT);
+	printState(val);
 #endif
 
 	if (pause_count == MAX_PAUSE_COUNT) {
@@ -92,5 +85,18 @@ void swith(int val) {
 		delay(30);
 		digitalWrite(candles[i], val);
 	}
+}
+
+void printState(int val) {
+	Serial.print("sensor: ");
+	Serial.print(val);
+	Serial.print("  night: ");
+	Serial.print(night_count);
+	Serial.print("/");
+	Serial.print(MAX_NIGHT_COUNT);
+	Serial.print("   pause: ");
+	Serial.print(pause_count);
+	Serial.print("/");
+	Serial.println(MAX_PAUSE_COUNT);
 }
 
