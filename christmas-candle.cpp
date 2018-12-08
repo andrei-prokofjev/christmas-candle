@@ -5,11 +5,11 @@
 
 #include "christmas-candle.h"
 #include "LowPower.h"
+#include "pins_candle.h"
 
-#define DEBUG_
 
-const int ON = 1;
-const int OFF = 0;
+#define DEBUG
+
 
 const int _10min = 75;
 const int _hour = 6 * _10min;
@@ -17,17 +17,8 @@ const int _hour = 6 * _10min;
 const int MAX_NIGHT_COUNT = 6 * _hour;
 const int MAX_PAUSE_COUNT =  12 * _hour;
 
-uint8_t led1 = 7;
-uint8_t led2 = 6;
-uint8_t led3 = 5;
-uint8_t led4 = 8;
-uint8_t led5 = 4;
-uint8_t led6 = 9;
-uint8_t led7 = 10;
-uint8_t led8 = 11;
-uint8_t led9 = 12;
 
-uint8_t candles[] = { led1, led2, led3, led4, led5, led6, led7, led8, led9 };
+uint8_t candles[] = { LED_1, LED_2, LED_3, LED_4, LED_5, LED_6, LED_7, LED_8, LED_9 };
 
 int night_count;
 int pause_count;
@@ -74,16 +65,16 @@ void loop() {
 
 	if (pause_count == MAX_PAUSE_COUNT) {
 		if (val > 750) {
-			if (digitalRead(led1) == OFF) {
-				swith(ON);
+			if (digitalRead(LED_1) == LOW) {
+				swith(HIGH);
 			}
 
 			if (++night_count == MAX_NIGHT_COUNT) {
-				swith(OFF);
+				swith(LOW);
 				pause_count = 0;
 			}
 		} else {
-			swith(OFF);
+			swith(LOW);
 		}
 	} else {
 		if (++pause_count == MAX_PAUSE_COUNT) {
