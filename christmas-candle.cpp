@@ -44,8 +44,6 @@ void setup() {
 	delay(100);
 }
 
-
-
 void loop() {
 
 	LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
