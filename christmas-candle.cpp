@@ -8,7 +8,7 @@
 #include "pins_candle.h"
 
 
-#define DEBUG
+#define DEBUGj
 
 
 const int _10min = 75;
@@ -22,6 +22,8 @@ uint8_t candles[] = { LED_1, LED_2, LED_3, LED_4, LED_5, LED_6, LED_7, LED_8, LE
 
 int night_count;
 int pause_count;
+
+
 
 void setup() {
 	Serial.begin(9600);
@@ -64,7 +66,7 @@ void loop() {
 				swith(LOW);
 				pause_count = 0;
 			}
-		} else {
+		} else if (val < 700) {
 			swith(LOW);
 		}
 	} else {
